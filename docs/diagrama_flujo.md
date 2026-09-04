@@ -6,7 +6,7 @@ navegador y la validación de acceso al sitio.
 
 ```mermaid
 flowchart TD
-    A([Inicio]) --> B[Iniciar Chrome con Selenium]
+    A([Inicio]) --> B[Iniciar Firefox con Selenium]
     B --> C[Abrir mantistcy.cl/clima]
     C --> D{¿La matriz está disponible?}
     D -- No --> E[Capturar pantalla y registrar error]
@@ -39,4 +39,3 @@ flowchart TD
 
 **Apertura y validación → navegación → extracción/carga → validación de
 umbrales → reporte y evidencias → cierre seguro.**
-

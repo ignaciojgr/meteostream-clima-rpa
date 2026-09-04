@@ -63,7 +63,7 @@ manera consistente superaciones de umbral.
 - extraer sismos y avisos;
 - demostrar llenado de formulario sin efectuar una publicación;
 - aplicar condicionales `if/elif/else` para el semáforo;
-- controlar errores, tomar una captura y cerrar Chrome aun si ocurre una falla;
+- controlar errores, tomar una captura y cerrar Firefox aun si ocurre una falla;
 - producir Excel, JSON y logs reproducibles.
 
 ## 6. Alcance y limitaciones
@@ -131,7 +131,7 @@ manera consistente superaciones de umbral.
 
 ## 11. Procedimiento de despliegue y uso
 
-1. Instalar Python y Chrome.
+1. Instalar Python y Firefox.
 2. Crear un entorno virtual e instalar `requirements.txt`.
 3. Copiar `.env.example` a `.env` si se requieren valores personalizados.
 4. Editar `data/maestro_umbrales_clima.csv`.
@@ -158,4 +158,5 @@ La solución se considera exitosa cuando procesa las estaciones, navega a las
 dos secciones complementarias, genera ambos reportes y supera al menos el 80 %
 de los casos definidos en [casos_prueba.md](casos_prueba.md). La validación del
 3 de septiembre de 2026 obtuvo 10 de 10 casos aprobados (100 %): 15 estaciones,
-20 sismos y cuatro evidencias visuales, sin publicar datos en el sitio.
+20 sismos y cuatro evidencias visuales con Firefox 155.0 y GeckoDriver 0.37.1,
+sin publicar datos en el sitio.

@@ -10,7 +10,7 @@ from pathlib import Path
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
@@ -30,7 +30,7 @@ class RobotExecutionError(RuntimeError):
 class MeteoStreamRobot:
     def __init__(self, settings: Settings):
         self.settings = settings
-        self.driver: webdriver.Chrome | None = None
+        self.driver: webdriver.Firefox | None = None
         self.wait: WebDriverWait | None = None
         self.logger = logging.getLogger("meteostream_rpa")
 
@@ -57,25 +57,24 @@ class MeteoStreamRobot:
             self.logger.addHandler(console_handler)
             self.logger.setLevel(logging.INFO)
 
-    def _build_driver(self) -> webdriver.Chrome:
+    def _build_driver(self) -> webdriver.Firefox:
         options = Options()
         if self.settings.headless:
-            options.add_argument("--headless=new")
-        options.add_argument("--window-size=1440,1200")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--no-sandbox")
-        options.add_experimental_option(
-            "prefs",
-            {
-                "download.default_directory": str(self.settings.download_dir.resolve()),
-                "download.prompt_for_download": False,
-                "safebrowsing.enabled": True,
-            },
-        )
+            options.add_argument("-headless")
+        options.add_argument("--width=1440")
+        options.add_argument("--height=1200")
+
+        # Firefox descarga la telemetría sin abrir diálogos interactivos.
+        options.set_preference("browser.download.folderList", 2)
+        options.set_preference("browser.download.dir", str(self.settings.download_dir.resolve()))
+        options.set_preference("browser.download.useDownloadDir", True)
+        options.set_preference("browser.download.alwaysOpenPanel", False)
+        options.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/plain,application/octet-stream")
+        options.set_preference("pdfjs.disabled", True)
         try:
-            return webdriver.Chrome(options=options)
+            return webdriver.Firefox(options=options)
         except WebDriverException as exc:
-            raise RobotExecutionError(f"No fue posible iniciar Google Chrome: {exc.msg}") from exc
+            raise RobotExecutionError(f"No fue posible iniciar Mozilla Firefox: {exc.msg}") from exc
 
     def run(self, download_raw: bool = False, fill_demo_form: bool = False) -> RunResult:
         """Ejecuta el flujo completo y devuelve las rutas de los resultados."""

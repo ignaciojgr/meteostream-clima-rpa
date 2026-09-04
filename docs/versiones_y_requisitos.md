@@ -7,15 +7,15 @@
 | Python | 3.10 o superior; validado con 3.14.7 |
 | Selenium | 4.25 o superior y menor que 5; validado con 4.48.0 |
 | openpyxl | 3.1 o superior y menor que 4; validado con 3.1.5 |
-| Navegador | Google Chrome o Chromium; validado con Chrome 152.0.7977.75 |
-| Controlador | Gestionado automáticamente por Selenium Manager |
+| Navegador | Mozilla Firefox; validado con Firefox 155.0 |
+| Controlador | GeckoDriver 0.37.1, gestionado automáticamente por Selenium Manager |
 
 Para documentar las versiones exactas del equipo:
 
 ```bash
 python --version
 python -c "import selenium, openpyxl; print(selenium.__version__, openpyxl.__version__)"
-google-chrome --version
+firefox --version
 ```
 
 ## Requisitos de sistema

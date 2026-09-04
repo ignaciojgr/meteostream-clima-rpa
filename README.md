@@ -23,7 +23,7 @@ BeautifulSoup, Playwright, Puppeteer ni herramientas RPA de terceros.
 ## Requisitos
 
 - Python 3.10 o superior.
-- Google Chrome o Chromium instalado.
+- Mozilla Firefox instalado.
 - Acceso a `https://mantistcy.cl/clima/`.
 - Las dependencias de [requirements.txt](requirements.txt).
 
@@ -35,8 +35,8 @@ source .venv/bin/activate          # Windows: .venv\Scripts\activate
 python -m pip install -r requirements.txt
 ```
 
-Selenium Manager obtiene automáticamente un controlador compatible cuando es
-necesario. No se guardan credenciales en el repositorio.
+Selenium Manager obtiene automáticamente **GeckoDriver**, el controlador de
+Firefox, cuando es necesario. No se guardan credenciales en el repositorio.
 
 ## Ejecución
 
@@ -99,4 +99,3 @@ El robot limita su actividad a datos públicos, usa esperas explícitas y no
 publica avisos por defecto. Ajusta la frecuencia de ejecución de forma
 responsable para no sobrecargar la plataforma. Los valores obtenidos son una
 fuente de apoyo y no sustituyen canales meteorológicos o sísmicos oficiales.
-
