@@ -56,10 +56,14 @@ avisos adicionales por lluvia.
 
 Pruebas: `.venv/bin/python -m unittest -v test_excel_clima.py`.
 
-## Version anterior del repositorio
+## Archivos del proyecto
 
-`meteostream_rpa/`, `data/`, `docs/` y `tests/` corresponden a la version modular
-anterior. El robot actual se ejecuta con `python ej.py`; su prueba es
-`python -m unittest -v test_excel_clima.py`.
+- `ej.py`: todas las funciones del robot.
+- `maestro_umbrales_clima.xlsx`: umbrales configurables de entrada.
+- `requirements.txt`: dependencias de Python.
+- `test_excel_clima.py`: pruebas de comparacion y exportacion Excel.
+- `README.md`: instrucciones de instalacion y uso.
+- `.gitignore`: exclusiones de archivos generados y temporales.
+- `LICENSE`: licencia del proyecto.
 
 Los archivos generados en `evidencias/` se conservan localmente y se excluyen de Git.

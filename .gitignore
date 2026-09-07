@@ -14,14 +14,6 @@ __pycache__/
 *.egg-info/
 .coverage
 htmlcov/
-work/
-salidas/*
-!salidas/.gitkeep
-descargas/*
-!descargas/.gitkeep
-logs/*
-!logs/.gitkeep
 .DS_Store
 Thumbs.db
 *.crdownload
-!.env.example
