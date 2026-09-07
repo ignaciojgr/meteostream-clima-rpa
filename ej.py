@@ -517,6 +517,13 @@ def guardar_excel(estaciones, umbrales, carpeta, fuente):
                 font=Font(color="991B1B", bold=True),
             )
         )
+        
+    # --- MARCA DE AGUA ---
+    ultima_fila = hoja.max_row + 2
+    hoja.cell(ultima_fila, 1, "Hecho por Fabiola villagra Ignacio gonzales y Francisca Sanheuza").font = Font(
+        name="Arial", size=10, italic=True, color="888888"
+    )
+    
     libro.save(ruta)
     libro.close()
     print(f"   [Excel consolidado] {ruta} ({len(estaciones)} estaciones)")
@@ -728,6 +735,11 @@ def main():
                 import shutil
                 shutil.rmtree(descargas, ignore_errors=True)
             print("\nNavegador cerrado.")
+            
+        print("\n" + "=" * 60)
+        print(" [MARCA DE AGUA] - AUTOMATIZACION RPA")
+        print(" Hecho por Fabiola villagra Ignacio gonzales y Francisca Sanheuza")
+        print("=" * 60 + "\n")
 
 
 if __name__ == "__main__":
