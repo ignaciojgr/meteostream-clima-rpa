@@ -95,49 +95,73 @@ def esperar(segundos, motivo):
 
 
 def crear_driver(navegador):
-    """Abre el navegador elegido. Usa if / elif / else para decidir cual."""
+    """Abre el navegador buscando el preferido y con alternativas (fallback)."""
     navegador = navegador.lower().strip()
-    # Una carpeta por ejecucion evita confundir archivos antiguos con la descarga.
     descargas = mkdtemp(prefix="descarga_", dir=CARPETA)
-    preferencias = {
-        "download.default_directory": descargas,
-        "download.prompt_for_download": False,
-        "download.directory_upgrade": True,
-    }
-
-    if navegador == "chrome":
-        opciones = webdriver.ChromeOptions()
-        opciones.add_argument("--window-size=1400,900")
-        opciones.add_experimental_option("prefs", preferencias)
-        driver = webdriver.Chrome(options=opciones)
-
-    elif navegador == "firefox":
-        opciones = webdriver.FirefoxOptions()
-        opciones.add_argument("--width=1400")
-        opciones.add_argument("--height=900")
-        opciones.set_preference("browser.download.folderList", 2)
-        opciones.set_preference("browser.download.dir", descargas)
-        opciones.set_preference("browser.download.useDownloadDir", True)
-        opciones.set_preference(
-            "browser.helperApps.neverAsk.saveToDisk", "text/plain,application/octet-stream"
-        )
-        driver = webdriver.Firefox(options=opciones)
-
-    elif navegador == "edge":
-        opciones = webdriver.EdgeOptions()
-        opciones.add_argument("--window-size=1400,900")
-        opciones.add_experimental_option("prefs", preferencias)
-        driver = webdriver.Edge(options=opciones)
-
+    
+    # Lista de navegadores a intentar, priorizando el elegido
+    opciones_nav = ["chrome", "edge", "firefox"]
+    if navegador in opciones_nav:
+        opciones_nav.remove(navegador)
+        orden = [navegador] + opciones_nav
     else:
-        # Validacion: si escriben cualquier otra cosa, el proceso se corta aca
-        raise ValueError(
-            "Navegador '" + navegador + "' no soportado. Use chrome, firefox o edge."
-        )
+        orden = opciones_nav
+        print(f"   [!] Navegador '{navegador}' desconocido. Intentando auto-deteccion.")
+
+    driver = None
+    nav_exitoso = None
+    
+    for nav in orden:
+        try:
+            print(f"   Intentando iniciar navegador: {nav}...")
+            if nav == "chrome":
+                opciones = webdriver.ChromeOptions()
+                opciones.add_argument("--window-size=1400,900")
+                opciones.add_experimental_option("prefs", {
+                    "download.default_directory": descargas,
+                    "download.prompt_for_download": False,
+                    "download.directory_upgrade": True,
+                })
+                driver = webdriver.Chrome(options=opciones)
+                
+            elif nav == "firefox":
+                opciones = webdriver.FirefoxOptions()
+                opciones.add_argument("--width=1400")
+                opciones.add_argument("--height=900")
+                opciones.set_preference("browser.download.folderList", 2)
+                opciones.set_preference("browser.download.dir", descargas)
+                opciones.set_preference("browser.download.useDownloadDir", True)
+                opciones.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/plain,application/octet-stream")
+                driver = webdriver.Firefox(options=opciones)
+                
+            elif nav == "edge":
+                opciones = webdriver.EdgeOptions()
+                opciones.add_argument("--window-size=1400,900")
+                opciones.add_experimental_option("prefs", {
+                    "download.default_directory": descargas,
+                    "download.prompt_for_download": False,
+                    "download.directory_upgrade": True,
+                })
+                driver = webdriver.Edge(options=opciones)
+            
+            # Si llego aca es porque pudo iniciarlo con exito
+            nav_exitoso = nav
+            break
+            
+        except Exception as e:
+            print(f"   [!] No se encontro o fallo {nav}. Detalle: {e}")
+            continue
+
+    if driver is None:
+        import shutil
+        shutil.rmtree(descargas, ignore_errors=True)
+        raise RuntimeError("No se encontro NINGUN navegador compatible (Chrome, Edge, Firefox) en esta maquina.")
 
     # Tiempo maximo que el navegador espera a que la pagina cargue entera
+    print(f"   [OK] Navegador cargado exitosamente: {nav_exitoso}")
     driver.set_page_load_timeout(TIEMPO_MAXIMO)
     driver.telemetria_descargas = descargas
+    driver.nombre_navegador_usado = nav_exitoso
     return driver
 
 
@@ -676,7 +700,11 @@ def main():
         # El finally se ejecuta siempre: haya error o no, se cierra el navegador
         if driver:
             esperar(PAUSA_PASO, "dejar ver el resultado final antes de cerrar")
+            descargas = getattr(driver, "telemetria_descargas", None)
             driver.quit()
+            if descargas and os.path.exists(descargas):
+                import shutil
+                shutil.rmtree(descargas, ignore_errors=True)
             print("\nNavegador cerrado.")
 
 
