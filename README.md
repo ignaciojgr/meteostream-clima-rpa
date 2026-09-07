@@ -1,101 +1,65 @@
-# METEOSTREAM Clima Chile — Robot RPA con Python y Selenium
+# Robot MeteoStream
 
-Proyecto académico de automatización para la plataforma pública
-[METEOSTREAM Clima Chile](https://mantistcy.cl/clima/). Todas las acciones web
-se realizan exclusivamente con **Python + Selenium**; no se usan `requests`,
-BeautifulSoup, Playwright, Puppeteer ni herramientas RPA de terceros.
-
-## Qué automatiza
-
-1. Abre el sitio y valida que la matriz meteorológica esté disponible.
-2. Recorre las tarjetas de estaciones y extrae zona, temperatura, humedad,
-   PM2.5, condición, máximas, mínimas y lluvia.
-3. Selecciona una ciudad en el pronóstico extendido para demostrar carga de
-   información en un control web.
-4. Descarga opcionalmente la telemetría Raw mediante un clic de Selenium.
-5. Navega mediante los enlaces del sitio hacia sismos y avisos.
-6. Extrae la tabla de sismos y los avisos activos.
-7. Puede rellenar el formulario de avisos en modo demostración, **sin pulsar
-   “Publicar Aviso”** y sin modificar el sitio.
-8. Compara los datos con umbrales configurables, genera un Excel con formato
-   de alertas, un resumen JSON, evidencias PNG y un log cronológico.
-
-## Requisitos
-
-- Python 3.10 o superior.
-- Mozilla Firefox instalado.
-- Acceso a `https://mantistcy.cl/clima/`.
-- Las dependencias de [requirements.txt](requirements.txt).
-
-## Instalación
+Crear el entorno e instalar dependencias:
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
+source .venv/bin/activate
+# Windows: .venv\Scripts\activate
 python -m pip install -r requirements.txt
+python ej.py
 ```
 
-Selenium Manager obtiene automáticamente **GeckoDriver**, el controlador de
-Firefox, cuando es necesario. No se guardan credenciales en el repositorio.
+Se requiere Firefox instalado (o Chrome/Edge al cambiar `NAVEGADOR`).
+El robot extrae estaciones, descarga la telemetria TXT mediante un clic,
+consulta sismos mediante un enlace y abre el formulario de avisos.
+`PUBLICAR_AVISO = True` envia el aviso; usar `False` para solo rellenar el formulario.
 
-## Ejecución
+Todas las funciones del robot estan en `ej.py`, incluida la integracion Excel.
+Para entregar el codigo basta ese archivo Python; el maestro
+`maestro_umbrales_clima.xlsx` sigue siendo un archivo de entrada necesario.
+Se requieren Selenium y openpyxl: `python -m pip install selenium openpyxl`.
+El archivo de pruebas es solo para desarrollo y no se necesita para ejecutar el robot.
 
-Ejecución segura recomendada:
+## Excel y umbrales
 
-```bash
-python -m meteostream_rpa --headless --ciudad Santiago
-```
+El robot carga `maestro_umbrales_clima.xlsx`, situado junto a `ej.py`, antes
+de abrir el navegador. La hoja `Umbrales` debe tener estas columnas:
 
-Demostración completa, incluyendo descarga Raw y llenado del formulario sin
-envío:
+| parametro | umbral | unidad |
+| --- | ---: | --- |
+| mp25 | 50 | µg/m³ |
+| lluvia_mm | 20 | mm |
 
-```bash
-python -m meteostream_rpa --headless --ciudad Santiago \
-  --descargar-raw --llenar-formulario-demo
-```
+Los valores iniciales corresponden al ejemplo solicitado. Editar la columna
+`umbral` en Excel para cambiar la comparacion; los valores deben ser numericos.
+No se reemplaza un maestro existente ni se aplican valores predeterminados si
+falta o tiene errores.
 
-Para observar el navegador:
+Se extrae `Lluvia` del pie de cada tarjeta. Cada ejecucion guarda
+`evidencias/clima_consolidado_[FECHA].xlsx`, con fecha y hora para evitar
+sobrescribir ejecuciones anteriores. Incluye los datos de las estaciones,
+los umbrales utilizados, fecha de extraccion, fuente y una formula Excel:
 
-```bash
-python -m meteostream_rpa --visible --ciudad Valparaíso
-```
+- `ALERTA` si MP 2.5 supera su umbral **o** lluvia supera el suyo.
+- `SIN ALERTA` si ambos datos existen y ninguno supera su umbral.
+- `SIN DATO` si falta un dato y el disponible no dispara una alerta.
 
-Los resultados se guardan en `salidas/`, las descargas en `descargas/`, las
-capturas en `evidencias/` y el historial en `logs/meteostream_rpa.log`.
+Igualar el umbral no dispara una alerta. Las celdas vacias no equivalen a cero.
+La formula se calcula al abrir el archivo en Excel; el CSV incluye el estado
+calculado por Python. Los umbrales del consolidado son una copia de los usados
+en esa ejecucion, sin vinculos externos al maestro.
 
-## Pruebas
+`estado_alerta` es la comparacion solicitada para Excel/CSV. `calidad_aire` y la
+seleccion del aviso web mantienen la logica original de MP 2.5; no se generan
+avisos adicionales por lluvia.
 
-```bash
-python -m unittest discover -s tests -v
-```
+Pruebas: `.venv/bin/python -m unittest -v test_excel_clima.py`.
 
-La prueba en vivo se omite por defecto para no efectuar tráfico involuntario:
+## Version anterior del repositorio
 
-```bash
-RUN_LIVE_TESTS=1 python -m unittest tests.test_live_smoke -v
-```
+`meteostream_rpa/`, `data/`, `docs/` y `tests/` corresponden a la version modular
+anterior. El robot actual se ejecuta con `python ej.py`; su prueba es
+`python -m unittest -v test_excel_clima.py`.
 
-## Estructura
-
-```text
-meteostream_rpa/       Código del robot y punto de entrada
-data/                  Umbrales editables por ciudad
-docs/                  Informe técnico, flujo y casos de prueba
-evidencias/            Capturas obtenidas por Selenium
-tests/                 Pruebas unitarias y prueba en vivo opcional
-salidas/ descargas/    Artefactos generados durante la ejecución
-```
-
-## Documentación de la evaluación
-
-- [Informe técnico](docs/informe_tecnico.md)
-- [Diagrama de flujo](docs/diagrama_flujo.md)
-- [Casos de prueba](docs/casos_prueba.md)
-- [Versiones y requisitos técnicos](docs/versiones_y_requisitos.md)
-
-## Uso responsable
-
-El robot limita su actividad a datos públicos, usa esperas explícitas y no
-publica avisos por defecto. Ajusta la frecuencia de ejecución de forma
-responsable para no sobrecargar la plataforma. Los valores obtenidos son una
-fuente de apoyo y no sustituyen canales meteorológicos o sísmicos oficiales.
+Los archivos generados en `evidencias/` se conservan localmente y se excluyen de Git.

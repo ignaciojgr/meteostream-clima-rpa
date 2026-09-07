@@ -1,23 +1,27 @@
+evidencias/
+.venv/
+venv/
 __pycache__/
 *.py[cod]
-*.egg-info/
-.venv/
-.env
 .pytest_cache/
+.~lock.*#
+~$*.xlsx
+*.inspect.ndjson
+.env
+.env.*
+.codex/
+.agents/
+*.egg-info/
 .coverage
 htmlcov/
 work/
-
-# Archivos generados por cada ejecución
 salidas/*
 !salidas/.gitkeep
 descargas/*
 !descargas/.gitkeep
 logs/*
 !logs/.gitkeep
-evidencias/error_*.png
-
-# Archivos temporales del navegador y del sistema
 .DS_Store
 Thumbs.db
 *.crdownload
+!.env.example
