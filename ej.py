@@ -520,7 +520,7 @@ def guardar_excel(estaciones, umbrales, carpeta, fuente):
         
     # --- MARCA DE AGUA ---
     ultima_fila = hoja.max_row + 2
-    hoja.cell(ultima_fila, 1, "Hecho por Fabiola villagra Ignacio gonzales y Francisca Sanhueza").font = Font(
+    hoja.cell(ultima_fila, 1, "Hecho por Fabiola Villagra, Ignacio Gonzáles y Francisca Sanhueza").font = Font(
         name="Arial", size=10, italic=True, color="888888"
     )
     
@@ -738,7 +738,7 @@ def main():
             
         print("\n" + "=" * 60)
         print(" [MARCA DE AGUA] - AUTOMATIZACION RPA")
-        print(" Hecho por Fabiola villagra Ignacio gonzales y Francisca Sanhueza")
+        print(" Hecho por Fabiola Villagra, Ignacio Gonzáles y Francisca Sanhueza")
         print("=" * 60 + "\n")
 
 
