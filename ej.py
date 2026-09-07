@@ -29,6 +29,28 @@ import time
 from datetime import datetime
 from tempfile import mkdtemp
 from pathlib import Path
+import subprocess
+
+# ---------------------------------------------------------------
+# AUTO-INSTALACION DE DEPENDENCIAS FALTANTES
+# ---------------------------------------------------------------
+def instalar_requerimientos():
+    try:
+        import selenium
+        import openpyxl
+    except ImportError:
+        print("=" * 60)
+        print(" [!] Componentes faltantes detectados.")
+        print(" [!] Iniciando instalacion automatica de dependencias...")
+        print("=" * 60)
+        ruta_req = os.path.join(os.path.dirname(os.path.abspath(__file__)), "requirements.txt")
+        if os.path.exists(ruta_req):
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", ruta_req])
+        else:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "selenium>=4.25", "openpyxl>=3.1"])
+        print(" [OK] Dependencias instaladas correctamente.\n")
+
+instalar_requerimientos()
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.formatting.rule import FormulaRule
